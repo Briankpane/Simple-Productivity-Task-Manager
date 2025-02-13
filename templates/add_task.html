@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Task</title>
+</head>
+<body>
+    <h1>Add Task</h1>
+    <form method="POST" action="/add">
+        <input type="text" name="task" placeholder="Enter task" required>
+        <label for="start_writing">Start Writing</label>
+        <textarea name="start_writing" id="start_writing"> 
+        <br>
+        <label for="due_date">Due Date:</label>
+        <input type="date" id="due_date" name="due_date" required>
+        <br>
+        <label for="priority">Priority:</label>
+        <select name="priority" id="priority">
+            <option value="High">High</option>
+            <option value="Medium" selected>Medium</option>
+            <option value="Low">Low</option>
+        </select>
+        <br>
+        <button type="submit">Add</button>
+    </form>
+</body>
+</html>

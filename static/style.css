@@ -1,0 +1,52 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: #000; /* black background */
+    color: green;         /* green text */
+    text-align: center;
+    position: relative;
+}
+
+/* Display current date in the top right corner */
+.current-date {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 16px;
+}
+
+/* Headings remain green */
+h1, h2 {
+    color: green;
+}
+
+/* Center and style the task list */
+ul {
+    list-style-type: none;
+    padding: 0;
+    display: inline-block; /* centers the list container */
+    text-align: left;      /* list items are left-aligned inside the container */
+}
+
+li {
+    margin: 10px 0;
+}
+
+/* Links are green and have no underline */
+a {
+    text-decoration: none;
+    margin-left: 10px;
+    color: green;
+}
+
+/* Form elements: ensure text is green */
+input, textarea, select, button {
+    color: green;
+}
+
+/* Textarea: small initial box that is resizable */
+textarea {
+    width: 200px;    /* small initial width */
+    height: 50px;    /* small initial height */
+    resize: both;    /* allow user to adjust size horizontally and vertically */
+}

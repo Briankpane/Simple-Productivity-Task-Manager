@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task Manager</title>
+  <style>
+    .task-item {
+      margin-bottom: 20px;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 10px;
+    }
+    .writing-form, .timer-controls {
+      margin-top: 10px;
+    }
+    body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: #000;
+    color: #fff;
+}
+
+h1, h2 {
+    color: #fff;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    margin: 10px 0;
+}
+
+a {
+    text-decoration: none;
+    margin-left: 10px;
+    color: #000000;
+}
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: #000; /* black background */
+    color: 
+    rgb(0, 255, 0);         /* green text */
+    text-align: center;
+    position: relative;
+}
+
+/* Display current date in the top right corner */
+.current-date {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 16px;
+}
+
+/* Headings remain green */
+h1, h2 {
+    color: 
+    rgb(0, 255, 0);
+}
+
+/* Center and style the task list */
+ul {
+    list-style-type: none;
+    padding: 0;
+    display: inline-block; /* centers the list container */
+    text-align: left;      /* list items are left-aligned inside the container */
+}
+
+li {
+    margin: 10px 0;
+}
+
+/* Links are green and have no underline */
+a {
+    text-decoration: none;
+    margin-left: 10px;
+    color: rgb(0, 255, 0);
+}
+
+/* Form elements: ensure text is green */
+input, textarea, select, button {
+    color: rgb(0, 0, 0);
+}
+
+/* Textarea: small initial box that is resizable */
+textarea {
+    width: 200px;    /* small initial width */
+    height: 50px;    /* small initial height */
+    resize: both;    /* allow user to adjust size horizontally and vertically */
+}
+
+
+  </style>
+</head>
+<body>
+  <h1>Control Center</h1>
+  <div id="currentTime"></div>
+  
+  
+  <script>
+  function updateTime() {
+    const now = new Date();
+    // Format the date and time as desired
+    const dateString = now.toLocaleDateString();    // e.g., "1/26/2023"
+    const timeString = now.toLocaleTimeString();    // e.g., "10:35:42 AM"
+    document.getElementById('currentTime').innerText = dateString + ' ' + timeString;
+  }
+
+  // Call updateTime once to set the time immediately
+  updateTime();
+
+  // Update the time every second (1000 milliseconds)
+  setInterval(updateTime, 1000);
+</script>
+<script>
+    function updateTime() {
+      const now = new Date();
+      // Format the date and time as desired
+      const dateString = now.toLocaleDateString();    // e.g., "1/26/2023"
+      const timeString = now.toLocaleTimeString();    // e.g., "10:35:42 AM"
+      document.getElementById('currentTime').innerText = dateString + ' ' + timeString;
+    }
+  
+    // Call updateTime once to set the time immediately
+    updateTime();
+  
+    // Update the time every second (1000 milliseconds)
+    setInterval(updateTime, 1000);
+  </script>
+  
+    <!-- Sort Options -->
+    <div style="margin-bottom: 20px;">
+        <a href="/?sort=priority">Sort by Priority</a>
+      </div>
+  <!-- Task List -->
+  <ul>
+    {% for task in tasks %}
+      <li class="task-item">
+        <strong>{{ loop.index }}. {{ task.task }}</strong> - Due: {{ task.due_date }} - Priority: {{ task.priority }} -
+        {% if task.completed %}
+          <span>✔ Completed</span>
+        {% else %}
+          <a href="/complete/{{ loop.index0 }}">Mark as Completed</a>
+        {% endif %}
+        <a href="/delete/{{ loop.index0 }}">Delete</a>
+
+        <!-- Inline "Start Writing" Form -->
+        <div class="writing-form">
+          <form method="POST" action="/update_writing/{{ loop.index0 }}">
+            <label for="start_writing_{{ loop.index0 }}">Start Writing:</label><br>
+            <textarea name="start_writing" id="start_writing_{{ loop.index0 }}" rows="1" cols="10">{{ task.start_writing }}</textarea>
+            <br>
+            <button type="submit">Save Writing</button>
+            <button type="button" onclick="copyText({{ loop.index0 }})">Copy to Clipboard</button>
+          </form>
+        </div>
+
+        <!-- Timer Controls -->
+        <div class="timer-controls">
+          <button type="button" onclick="startTimer({{ loop.index0 }})">Start Timer</button>
+          <button type="button" onclick="stopTimer({{ loop.index0 }})">Stop Timer</button>
+          <button type="button" onclick="resetTimer({{ loop.index0 }})">Reset Timer</button>
+          <!-- Store the saved elapsed time in a data attribute -->
+          <span id="timerDisplay_{{ loop.index0 }}" data-elapsed="{{ task.elapsed_time }}">
+            <!-- Timer display will be initialized by JavaScript -->
+          </span>
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+
+  <!-- Add Task Form -->
+  <h3>Add a Task</h3>
+  <form action="/add" method="POST">
+    <input type="text" name="task" placeholder="Enter task" required>
+    <br>
+    <label for="due_date">Due Date:</label>
+    <input type="date" id="due_date" name="due_date" required>
+    <br>
+    <label for="priority">Priority:</label>
+    <select name="priority" id="priority">
+      <option value="High">High</option>
+      <option value="Medium" selected>Medium</option>
+      <option value="Low">Low</option>
+    </select>
+    <br>
+    <button type="submit">Add Task</button>
+  </form>
+
+  <!-- JavaScript for Copying Text and Timer Functionality -->
+  <script>
+    // Function to copy the text from the textarea to the clipboard.
+    function copyText(index) {
+      const textarea = document.getElementById('start_writing_' + index);
+      if (textarea) {
+        navigator.clipboard.writeText(textarea.value)
+          .then(() => {
+            alert("Text copied to clipboard!");
+          })
+          .catch(err => {
+            console.error("Failed to copy text: ", err);
+          });
+      }
+    }
+
+    // Global objects to store timer start times and interval IDs
+    var timers = {};         // Stores the timestamp when the timer was started (for each task)
+    var timerIntervals = {}; // Stores the setInterval IDs for each task
+
+    // Helper function to format milliseconds as hh:mm:ss
+    function formatTime(ms) {
+      var totalSeconds = Math.floor(ms / 1000);
+      var seconds = totalSeconds % 60;
+      var minutes = Math.floor(totalSeconds / 60) % 60;
+      var hours = Math.floor(totalSeconds / 3600);
+      return (hours < 10 ? "0" + hours : hours) + ":" +
+             (minutes < 10 ? "0" + minutes : minutes) + ":" +
+             (seconds < 10 ? "0" + seconds : seconds);
+    }
+
+    // Initialize all timer displays from the saved elapsed_time value.
+    document.querySelectorAll('[id^="timerDisplay_"]').forEach(function(span) {
+      var saved = parseInt(span.getAttribute('data-elapsed')) || 0;
+      span.textContent = formatTime(saved);
+    });
+
+    // Start the timer for a given task (by index)
+    function startTimer(index) {
+      // If a timer is already running for this task, do nothing.
+      if (timerIntervals[index]) return;
+
+      // Get the saved elapsed time from the display's data attribute
+      const display = document.getElementById("timerDisplay_" + index);
+      var savedTime = parseInt(display.getAttribute('data-elapsed')) || 0;
+
+      // Record the current timestamp as the start time.
+      timers[index] = Date.now();
+      timerIntervals[index] = setInterval(function() {
+        var now = Date.now();
+        var elapsed = now - timers[index]; // new elapsed time in ms
+        var total = savedTime + elapsed;
+        display.textContent = formatTime(total);
+      }, 1000);
+    }
+
+    // Stop the timer for a given task and save the total elapsed time
+    function stopTimer(index) {
+      if (timerIntervals[index]) {
+        clearInterval(timerIntervals[index]);
+        timerIntervals[index] = null;
+        const display = document.getElementById("timerDisplay_" + index);
+        var savedTime = parseInt(display.getAttribute('data-elapsed')) || 0;
+        var elapsed = Date.now() - timers[index];
+        var total = savedTime + elapsed;
+        // Update the data attribute and display
+        display.setAttribute('data-elapsed', total);
+        display.textContent = formatTime(total);
+        // Send the updated time to the server
+        updateServerTimer(index, total);
+      }
+    }
+
+    // Reset the timer for a given task
+    function resetTimer(index) {
+      // Clear any running timer
+      if (timerIntervals[index]) {
+        clearInterval(timerIntervals[index]);
+        timerIntervals[index] = null;
+      }
+      const display = document.getElementById("timerDisplay_" + index);
+      display.setAttribute('data-elapsed', 0);
+      display.textContent = "00:00:00";
+      // Update the server with 0 elapsed time
+      fetch('/reset_timer/' + index, {
+        method: 'POST'
+      }).catch(err => console.error("Failed to reset timer:", err));
+    }
+
+    // Sends the updated elapsed time to the server via a POST request.
+    function updateServerTimer(index, totalTime) {
+      // Use FormData to send the elapsed_time value.
+      var formData = new FormData();
+      formData.append('elapsed_time', totalTime);
+      fetch('/update_timer/' + index, {
+        method: 'POST',
+        body: formData
+      }).catch(err => console.error("Failed to update timer:", err));
+    }
+  </script>
+</body>
+</html>
