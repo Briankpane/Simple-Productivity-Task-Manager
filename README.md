@@ -1,1 +1,2 @@
-# Simple-Productivity-Task-Manager
+# Simple-Productivity-Task-Manager application using venv and flask
+
